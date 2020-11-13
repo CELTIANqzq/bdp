@@ -1,6 +1,8 @@
 from scipy.stats import pearsonr
 import  pandas  as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 df=pd.read_csv('Dataset/train_supplement.csv')#这个会直接默认读取到这个Excel的第一个表单
 pd.set_option('display.max_columns',None) #设置显示列数
 pd.set_option('display.max_rows',None) #设置显示行数
@@ -14,6 +16,16 @@ print("ratings_count:"+str(pccs_ratings_count))
 pccs_text_reviews_count = pearsonr(df.text_reviews_count, df.average_rating)
 print("text_reviews_count:"+str(pccs_text_reviews_count))
 #
+#协方差与相关系数及其热力图
+corrmat = df.corr()
+cols = corrmat.nlargest(4, 'average_rating')['average_rating'].index
+print(cols)
+cm = np.corrcoef(df[cols].values.T)
+print(cm)
+sns.set(font_scale=1.25)
+hm = sns.heatmap(cm, cbar=True, annot=True, square=True, fmt='.2f', annot_kws={'size': 10}, yticklabels=cols.values, xticklabels=cols.values)
+plt.show()
+
 #将三个数据值和一个评分分别转换为np.array模式
 book_data = np.zeros([0,3], dtype = int)
 count=0;
@@ -21,8 +33,8 @@ for line in df.itertuples():
     book_data=np.insert(book_data,count, [[line.num_pages, line.ratings_count, line.text_reviews_count]], axis=0)
     count=count+1
 book_target=np.array(df.average_rating)
-threshold=10000
-np.set_printoptions(threshold=np.inf)
+# threshold=10000
+# np.set_printoptions(threshold=np.inf)
 # print(book_data)
 # print(book_target.shape)
 
